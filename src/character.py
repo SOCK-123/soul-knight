@@ -1,9 +1,9 @@
 import pygame
 from pygame.locals import * # 导入pygame中所有常量
+from src.map import *
 import time
 import random
 import math
-
 class MySprite(pygame.sprite.Sprite):
     def __init__(self, target):
         # basic picture attributes-----------------------------------
@@ -24,7 +24,7 @@ class MySprite(pygame.sprite.Sprite):
         #------------------------------------------------------
         # character message
         self.direction = 0  # 向左为0，向右为1，控制动画播放
-        self.velocity = [0.0, 0.0]      # 人物速度[v_x, v_y]
+        self.velocity = [0, 0]      # 人物速度[v_x, v_y]
         self.movement = False  # 控制是否移动
 
     #X property
@@ -55,17 +55,17 @@ class MySprite(pygame.sprite.Sprite):
             self.last_frame = self.first_frame +1          # 人物静止
 
     #load picture---------------------------------------------------------
-    def load(self, filename, width, height, columns):
+    def load(self, filename, width, height, columns,birth_x=400,birth_y=300):
         self.master_image = pygame.image.load(filename).convert_alpha()
         self.frame_width = width
         self.frame_height = height
-        self.rect = Rect(0,0,width,height)
+        self.rect = Rect(birth_x,birth_y,width,height)
         self.columns = columns
        # rect = self.master_image.get_rect()
        # self.last_frame = 0
 
     #update picture-------------------------------------------------------
-    def update(self, current_time, rate=100):
+    def update(self, current_time, rate=1):
         # 循环播放动画
         if current_time > self.last_time + rate:
             self.frame += 1
@@ -110,25 +110,23 @@ class Hero0(MySprite):
         text = pygame.font.Font("1.ttf", 30)
         hp = text.render("HP", 3, WHITE)
         mp = text.render("MP", 3, WHITE)
-        screen.blit(hp, (15, 597))
-        screen.blit(mp, (15, 647))
-        pygame.draw.rect(screen, WHITE, (70, 600, 200, 30), 4)
-        pygame.draw.rect(screen, WHITE, (70, 650, 200, 30), 4)
+        screen.blit(hp, (15, 0))
+        screen.blit(mp, (15, 50))
+        pygame.draw.rect(screen, WHITE, (70, 0, 200, 30), 4)
+        pygame.draw.rect(screen, WHITE, (70, 50, 200, 30), 4)
 
-        pygame.draw.rect(screen, RED, (73, 603, 195 * self.currentHP / self.__maxHp, 25), 0)
-        pygame.draw.rect(screen, BLUE, (73, 653, 195 * self.currentMP / self.__maxMp, 25), 0)
+        pygame.draw.rect(screen, RED, (73, 3, 195 * self.currentHP / self.__maxHp, 25), 0)
+        pygame.draw.rect(screen, BLUE, (73, 53, 195 * self.currentMP / self.__maxMp, 25), 0)
 
         text0 = pygame.font.Font("1.ttf", 30)
         hp_n = text0.render(str(self.currentHP) + ' / ' + str(self.__maxHp), 10, WHITE)
         mp_n = text0.render(str(self.currentMP) + ' / ' + str(self.__maxMp), 10, WHITE)
-        screen.blit(hp_n, (140, 597))
-        screen.blit(mp_n, (115, 647))
+        screen.blit(hp_n, (140, -2))
+        screen.blit(mp_n, (115, 48))
 
     def update(self, current_time, rate=100):
         MySprite.update(self, current_time, rate)
         self.show_state(self.target_surface)
-
-
 
 class Bullet(MySprite):
     def __init__(self, target, speed):
@@ -139,8 +137,6 @@ class Bullet(MySprite):
         self.movement = True
     def is_out_screen(self):
         return self.X > 1080 or self.Y > 720 or self.X < 0 or self.Y < 0
-
-
 
 class Bullet_list(object):
     def __init__(self, display_target, file, bullet_speed = 25):
@@ -192,9 +188,13 @@ class Monster0(MySprite):
         self.target_direction = [0,0]
         self.target_distance = 0
 
+
+        self.other = [0,0]
+
     def update(self, current_time, rate=100):
         MySprite.update(self, current_time, rate)
-        x = self.attack_target.X - self.X
+
+        x = self.attack_target.X - self.X########
         y = self.attack_target.Y - self.Y
         self.target_distance = x*x + y*y
         if x != 0 or y != 0:
@@ -207,8 +207,8 @@ class Monster0(MySprite):
         if self.movement == True and time.process_time() - self.random_move > self.random_moveCD:
             self.random_move = time.process_time()
 
-            self.velocity[0] = 4 * self.target_direction[0]
-            self.velocity[1] = 4 * self.target_direction[1]
+            self.velocity[0] = 6 * self.target_direction[0]
+            self.velocity[1] = 6 * self.target_direction[1]
             if self.velocity[0] > 0:
                 self.direction = 1
             else:
