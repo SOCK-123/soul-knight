@@ -94,6 +94,8 @@ class Hero0(MySprite):
        # self.is_attack = False
         self.last_attack_time = 0
         self.atackCD = 0.1
+        self.herox=540
+        self.heroy=360
     def can_attack(self):
         return (time.process_time() - self.last_attack_time > self.atackCD) \
                and self.currentMP > 0
